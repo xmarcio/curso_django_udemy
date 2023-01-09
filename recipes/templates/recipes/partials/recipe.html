@@ -1,38 +1,45 @@
 <div class="recipe recipe-list-item">
     {% if recipe.cover %}
-    <div class="recipe-cover">
-        <a href="{% url 'receitas:receita' recipe.id %}">
-            <img src="{{ recipe.cover.url }}" alt="Temporário">
-        </a>
-    </div>
+        <div class="recipe-cover">
+            <a href="{% url 'recipes:recipe' recipe.id %}">
+                <img src="{{ recipe.cover.url }}" alt="Temporário">
+            </a>
+        </div>
+    {% endif %}
     <div class="recipe-title-container">
         <h2 class="recipe-title">
-            <a href="{% url 'receitas:receita' recipe.id %}">
+            <a href="{% url 'recipes:recipe' recipe.id %}">
                 {{ recipe.title }}
             </a>
         </h2>
     </div>
-    {% endif %}
-    
+
     <div class="recipe-author">
-        <span class="recipe-author-item">
-            <i class="fas fa-user"></i>
-            {% if recipe.author.first_name %}
-                {{ recipe.author.first_name }} {{ recipe.author.last_name }}
-            {% else %}
-                {{ recipe.author.username }}
-            {% endif %}
-        </span>
+
+        {% if recipe.author is not None %}
+            <span class="recipe-author-item">
+                <i class="fas fa-user"></i>
+                {% if recipe.author.first_name %}
+                    {{ recipe.author.first_name }} {{ recipe.author.last_name }}
+                {% else %}
+                    {{ recipe.author.username }}
+                {% endif %}
+            </span>
+        {% endif %}
+
         <span class="recipe-author-item">
             <i class="fas fa-calendar-alt"></i>
-            {{ recipe.created_at|date:"d/m/Y" }}
+            {{ recipe.created_at|date:"d/m/Y" }} às {{ recipe.created_at|date:"H:i" }}
         </span>
-        <span class="recipe-author-item">
-            <a href="{% url 'receitas:categoria' recipe.category.id %}">
-                <i class="fas fa-layer-group"></i>
-                <span>{{ recipe.category.name }}</span>
-            </a>
-        </span>
+
+        {% if recipe.category is not None %}
+            <span class="recipe-author-item">
+                <a href="{% url 'recipes:category' recipe.category.id %}">
+                    <i class="fas fa-layer-group"></i>
+                    <span>{{ recipe.category.name }}</span>
+                </a>
+            </span>
+        {% endif %}
     </div>
 
     <div class="recipe-content">
@@ -56,7 +63,7 @@
 
     {% if is_detail_page is not True %}
         <footer class="recipe-footer">
-            <a class="recipe-read-more button button-dark button-full-width" href="{% url 'receitas:receita' recipe.id %}">
+            <a class="recipe-read-more button button-dark button-full-width" href="{% url 'recipes:recipe' recipe.id %}">
                 <i class="fas fa-eye"></i>
                 <span>ver mais...</span>
             </a>
@@ -64,8 +71,13 @@
     {% endif %}
 
     {% if is_detail_page is True %}
-        <div class="preparations-steps">
-            {{ recipe.preparation_steps | linebreaks }}
-        </div>   
+        <div class="preparation-steps">
+            {% if recipe.prepatation_steps_is_html is True %}
+                {{ recipe.preparation_steps|safe }}
+            {% else %}
+                {{ recipe.preparation_steps|linebreaksbr }}
+            {% endif %}
+        </div>
     {% endif %}
+
 </div>
